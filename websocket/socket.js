@@ -6,14 +6,12 @@ const { sendingMessage } = require("../controllers/message.controller.js");
 const app = express();
 const httpServer = createServer(app);
 
-
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
-
 
 io.on("connection", (socket) => {
   console.log("a new user connected", socket.id);
@@ -28,10 +26,9 @@ io.on("connection", (socket) => {
   socket.on("sendMessage", (data) => {
     console.log("this is hamada");
     const { chatId, recieverId, message, userId } = data;
-    sendingMessage(io, {socket, ...data});
-    console.log({...data});
+    sendingMessage(io, { socket, ...data });
+    console.log({ ...data });
   });
-
 
   socket.on("disconnect", () => {
     console.log("userleaving");
