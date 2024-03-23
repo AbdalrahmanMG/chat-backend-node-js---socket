@@ -79,6 +79,7 @@ const createGroupChat = async (req, res) => {
         chatName,
       });
     }
+    console.log('chat');
 
     chat = await Chat.findById(chat._id).populate("participants");
 
@@ -88,5 +89,4 @@ const createGroupChat = async (req, res) => {
   }
 };
 
-}
 module.exports = { getContactsSideBar, getChats , createGroupChat};
