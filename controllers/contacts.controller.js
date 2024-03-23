@@ -2,7 +2,7 @@ const { User } = require("../models/user.model");
 const Chat = require("../models/chat.model.js");
 const Message = require("../models/message.model.js");
 
-// get all contacts except me 
+// get all contacts except me
 const getContactsSideBar = async (req, res) => {
   try {
     const loggedUserId = req.user.id;
@@ -12,11 +12,11 @@ const getContactsSideBar = async (req, res) => {
       },
     }).select("-password");
 
-    let modifiedContacts = allContacts.map(c=>({
+    let modifiedContacts = allContacts.map((c) => ({
       id: c._id,
       fullName: c.fullName,
       profilePic: c.profilePic,
-    }))
+    }));
 
     return res.status(200).json(modifiedContacts);
   } catch (error) {
@@ -34,7 +34,9 @@ const getChats = async (req, res) => {
     );
 
     if (!chats) {
-      return res.status(400).json({success: false, message:"No chats found"})
+      return res
+        .status(400)
+        .json({ success: false, message: "No chats found" });
     }
 
     for (let chat of chats) {
@@ -51,7 +53,7 @@ const getChats = async (req, res) => {
       lastMessage: chat.lastMessage,
       chatName: chat.chatName,
       createdAt: chat.createdAt,
-      updatedAt: chat.upda
+      updatedAt: chat.upda,
     }));
 
     return res.status(200).json(formattedChats);
@@ -60,7 +62,7 @@ const getChats = async (req, res) => {
   }
 };
 
-// create chat 
+// create chat
 const createGroupChat = async (req, res) => {
   try {
     const loggedUserId = req.user.id;
@@ -68,12 +70,20 @@ const createGroupChat = async (req, res) => {
 
     let chat = await Chat.findOne({
       participants: { $all: [loggedUserId, userId], $size: 2 },
-      isGroup: false
-    })
-    console.log("exist chat already",chat);
+      isGroup: false,
+    });
+    console.log("exist chat already", chat);
 
+    if (!chat && isGroup == false) {
+      chat = await Chat.create({
+        participants: [loggedUserId, userId],
+        isGroup,
+        chatPic,
+        chatName,
+      });
+    }
 
-    if (!chat) {
+    if (!chat && isGroup == true) {
       chat = await Chat.create({
         participants: [loggedUserId, ...participants],
         isGroup,
@@ -83,7 +93,7 @@ const createGroupChat = async (req, res) => {
     }
 
     chat = await Chat.findById(chat._id).populate("participants");
-    console.log('new chat',chat);
+    console.log("new chat", chat);
 
     return res.status(200).json({ success: true, chat });
   } catch (error) {
@@ -91,4 +101,4 @@ const createGroupChat = async (req, res) => {
   }
 };
 
-module.exports = { getContactsSideBar, getChats , createGroupChat};
+module.exports = { getContactsSideBar, getChats, createGroupChat };
