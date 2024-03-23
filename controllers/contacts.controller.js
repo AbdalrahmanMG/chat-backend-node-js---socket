@@ -70,6 +70,8 @@ const createGroupChat = async (req, res) => {
       participants: { $all: [loggedUserId, userId], $size: 2 },
       isGroup: false
     })
+    console.log("exist chat already",chat);
+
 
     if (!chat) {
       chat = await Chat.create({
@@ -79,10 +81,9 @@ const createGroupChat = async (req, res) => {
         chatName,
       });
     }
-    console.log('chat');
 
     chat = await Chat.findById(chat._id).populate("participants");
-    console.log(chat);
+    console.log('new chat',chat);
 
     return res.status(200).json({ success: true, chat });
   } catch (error) {
