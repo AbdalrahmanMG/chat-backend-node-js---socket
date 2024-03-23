@@ -82,6 +82,7 @@ const createGroupChat = async (req, res) => {
     console.log('chat');
 
     chat = await Chat.findById(chat._id).populate("participants");
+    console.log(chat);
 
     return res.status(200).json({ success: true, chat });
   } catch (error) {
