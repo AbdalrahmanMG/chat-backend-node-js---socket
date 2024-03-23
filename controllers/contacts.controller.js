@@ -61,25 +61,32 @@ const getChats = async (req, res) => {
 };
 
 // create chat 
-const createGroupChat = async (req, res)=>{
-try {
-  const loggedUserId = req.user.id;
-  const {participants, chatName, isGroup} = req.body
+const createGroupChat = async (req, res) => {
+  try {
+    const loggedUserId = req.user.id;
+    const { userId, participants, chatName, chatPic, isGroup } = req.body;
 
-  let chat = await Chat.create({
-    participants: [loggedUserId, ...participants],
-    chatName,
-    isGroup
-  })
+    let chat = await Chat.findOne({
+      participants: { $all: [loggedUserId, userId], $size: 2 },
+      isGroup: false
+    })
 
-  chat = await Chat.findById(chat._id).populate('participants');
+    if (!chat) {
+      chat = await Chat.create({
+        participants: [loggedUserId, ...participants],
+        isGroup,
+        chatPic,
+        chatName,
+      });
+    }
 
+    chat = await Chat.findById(chat._id).populate("participants");
 
-  return res.status(200).json({success: true, chat})
-} catch (error) {
-  return res.status(500).json({ success: false, message: error.message });
-}
-
+    return res.status(200).json({ success: true, chat });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 }
 module.exports = { getContactsSideBar, getChats , createGroupChat};
