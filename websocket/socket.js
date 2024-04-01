@@ -1,7 +1,7 @@
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const express = require("express");
-const { sendingMessage } = require("../controllers/message.controller.js");
+const { sendingMessage, deleteMessage } = require("../controllers/message.controller.js");
 
 const app = express();
 const httpServer = createServer(app);
@@ -28,8 +28,8 @@ io.on("connection", (socket) => {
   socket.on("sendMessage", (data) => {
     console.log("this is hamada");
     const { chatId, recieverId, message, userId } = data;
-    sendingMessage(io, socket, data );
-    console.log("is it in socket on 🧨🧨🧨",data );
+    sendingMessage(io, socket, data);
+    console.log("is it in socket on 🧨🧨🧨", data);
   });
 
   socket.on("disconnect", () => {
@@ -39,6 +39,15 @@ io.on("connection", (socket) => {
 
   socket.on('joinChatRoom', ({ chatId }) => {
     socket.join(chatId);
+  });
+
+  socket.on("deleteMessage", async (data) => {
+    console.log("delete message =>>", data);
+    try {
+      deleteMessage(io, data);
+    } catch (error) {
+      console.log(error);
+    }
   });
 
 });

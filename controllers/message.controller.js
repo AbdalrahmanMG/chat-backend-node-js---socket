@@ -107,10 +107,6 @@ const getMessage = async (req, res) => {
   }
 };
 
-
-// let messages = await Message.find(chatId = chat._id)
-// console.log("messages", messages);
-
 //update a message
 const updateMessage = async (req, res) => {
   try {
@@ -146,19 +142,21 @@ const updateMessage = async (req, res) => {
 };
 
 //delete a message
-const deleteMessage = async (req, res) => {
+const deleteMessage = async (io, data) => {
   try {
-    let { messageId } = req.body;
-    const LoggedUser = req.user.id;
+    console.log('deleting message', data);
+    let { messageId, userId } = data;
+    const LoggedUser = userId;
 
-    let messesToDelete = await Message.findOne({ _id: messageId });
+    let messageToDelete = await Message.findOne({ _id: messageId });
 
-    if (messesToDelete.senderId != LoggedUser) {
+    console.log("message to delete", messageToDelete);
+    if (messageToDelete.senderId != LoggedUser) {
       return res.status(403).json({ message: "user is not the sender!" });
     }
 
     let currentTime = new Date();
-    let createdAt = messesToDelete.createdAt;
+    let createdAt = messageToDelete.createdAt;
     let timeDifferance = currentTime - createdAt;
     let timeInMinutes = timeDifferance / (1000 * 60);
 
@@ -170,16 +168,16 @@ const deleteMessage = async (req, res) => {
     }
 
     await Message.deleteOne({ _id: messageId });
-    // await Chat.updateOne(
-    //   { _id: messesToDelete.chatId },
-    //   { $pull: { messages: messageId } }
-    // );
 
-    return res
-      .status(201)
-      .json({ success: true, message: "Message deleted succefully!" });
+    io.to(messageToDelete.chatId.toString()).emit('deleteMessage', { messageId });
+
+    return 
+    // return res
+    //   .status(201)
+    //   .json({ success: true, message: "Message deleted succefully!" });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.log(error);
+    // return res.status(500).json({ success: false, message: error.message });
   }
 };
 module.exports = { sendingMessage, getMessage, updateMessage, deleteMessage };
