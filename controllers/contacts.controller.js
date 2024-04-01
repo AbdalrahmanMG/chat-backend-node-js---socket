@@ -53,8 +53,11 @@ const getChats = async (req, res) => {
       lastMessage: chat.lastMessage,
       chatName: chat.chatName,
       createdAt: chat.createdAt,
-      updatedAt: chat.upda,
+      updatedAt: chat.updatedAt,
+      isGroup: chat.isGroup
     }));
+
+    formattedChats.sort((a,b)=> new Date(b.updatedAt) - new Date(a.updatedAt))
 
     return res.status(200).json(formattedChats);
   } catch (error) {

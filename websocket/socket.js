@@ -9,7 +9,7 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
     origin: "http://localhost:5173",
-    allowedHeaders:[],
+    // allowedHeaders:[],
     credentials: true,
     methods: ["GET", "POST"],
   },
@@ -28,14 +28,19 @@ io.on("connection", (socket) => {
   socket.on("sendMessage", (data) => {
     console.log("this is hamada");
     const { chatId, recieverId, message, userId } = data;
-    sendingMessage(io, { socket, ...data });
-    console.log({ ...data });
+    sendingMessage(io, socket, data );
+    console.log("is it in socket on 🧨🧨🧨",data );
   });
 
   socket.on("disconnect", () => {
     console.log("userleaving");
     // io.emit('getChats', chats)
   });
+
+  socket.on('joinChatRoom', ({ chatId }) => {
+    socket.join(chatId);
+  });
+
 });
 
 module.exports = { app, io, httpServer };

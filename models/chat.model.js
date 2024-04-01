@@ -17,13 +17,13 @@ let chatSchema = new mongoose.Schema(
         // required:true
       },
     ],
-    messages: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Message",
-        default: [],
-      },
-    ],
+    // messages: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Message",
+    //     default: [],
+    //   },
+    // ],
     isGroup:{
       type: Boolean,
       default: false
